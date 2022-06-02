@@ -18,14 +18,7 @@ public class SignService {
     public SignService() {
     }
 
-
-    public Image addAndEncodeSignature(MultipartFile originalImage, Image imageToSave) throws SignatureException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
-        Signature signature = addDigitalSignature(originalImage, imageToSave);
-        encodeDigitalSignature(imageToSave, signature);
-        return imageToSave;
-    }
-
-    private Signature addDigitalSignature(MultipartFile originalImage, Image imageToSave) throws SignatureException, IOException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public Signature addDigitalSignature(MultipartFile originalImage, Image imageToSave) throws SignatureException, IOException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException {
         Signature signature = Signature.getInstance("SHA256withRSA");
         byte[] originalImageData = originalImage.getBytes();
         PrivateKey pvt = getPrivateKey("src/main/resources/config/keys/key.private");
@@ -35,9 +28,9 @@ public class SignService {
         return signature;
     }
 
-    private void encodeDigitalSignature(Image imageToSave, Signature signature) throws SignatureException {
+    public String encodeDigitalSignature(Signature signature) throws SignatureException {
         byte[] signatureBytes = signature.sign();
-        imageToSave.setEncodedDigitalSignature(new Base64().encodeToString(signatureBytes));
+        return new Base64().encodeToString(signatureBytes);
     }
 
     private PrivateKey getPrivateKey(String filePath) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {

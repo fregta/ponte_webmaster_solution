@@ -1,4 +1,4 @@
-package hu.ponte.hr.controller;
+package hu.ponte.hr.dto;
 
 import hu.ponte.hr.domain.Image;
 import lombok.Builder;

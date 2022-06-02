@@ -1,12 +1,35 @@
 package hu.ponte.hr;
 
+import hu.ponte.hr.domain.Image;
+import hu.ponte.hr.repositories.ImageRepository;
+import hu.ponte.hr.services.ImageStore;
+import hu.ponte.hr.services.SignService;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * @author zoltan
@@ -23,11 +46,53 @@ public class SignTest
 		}
 	};
 
+	@Mock
+	private ImageRepository imageRepository;
 
+	private ImageStore imageStore;
 
 	@Test
-	public void test_01() {
+	public void test_01_cat() throws IOException, SignatureException, NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
+		imageStore = new ImageStore(imageRepository,new SignService());
+		File imageFile = new File("src/test/resources/images/cat.jpg");
+		FileInputStream input = new FileInputStream(imageFile);
+		MultipartFile multipartFile = new MockMultipartFile("cat.jpg",imageFile.getName(),"image/jpg", IOUtils.toByteArray(input));
 
+		when(imageRepository.save(any(Image.class))).thenAnswer(returnsFirstArg());
+
+		Image testResult = imageStore.storeImage(multipartFile);
+
+		assertEquals(testResult.getEncodedDigitalSignature(),files.get(testResult.getFileName()));
+
+	}
+
+	@Test
+	public void test_02_buzz() throws IOException, SignatureException, NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
+		imageStore = new ImageStore(imageRepository,new SignService());
+		File imageFile = new File("src/test/resources/images/enhanced-buzz.jpg");
+		FileInputStream input = new FileInputStream(imageFile);
+		MultipartFile multipartFile = new MockMultipartFile("enhanced-buzz.jpg",imageFile.getName(),"image/jpg", IOUtils.toByteArray(input));
+
+		when(imageRepository.save(any(Image.class))).thenAnswer(returnsFirstArg());
+
+		Image testResult = imageStore.storeImage(multipartFile);
+
+		assertEquals(testResult.getEncodedDigitalSignature(),files.get(testResult.getFileName()));
+
+	}
+
+	@Test
+	public void test_03_rnd() throws IOException, SignatureException, NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
+		imageStore = new ImageStore(imageRepository,new SignService());
+		File imageFile = new File("src/test/resources/images/rnd.jpg");
+		FileInputStream input = new FileInputStream(imageFile);
+		MultipartFile multipartFile = new MockMultipartFile("rnd.jpg",imageFile.getName(),"image/jpg", IOUtils.toByteArray(input));
+
+		when(imageRepository.save(any(Image.class))).thenAnswer(returnsFirstArg());
+
+		Image testResult = imageStore.storeImage(multipartFile);
+
+		assertEquals(testResult.getEncodedDigitalSignature(),files.get(testResult.getFileName()));
 	}
 
 
