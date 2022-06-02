@@ -34,6 +34,7 @@ public class ImageStore {
     public Image storeImage(MultipartFile image) throws SignatureException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
 
         Image imageToSave = new Image(image);
+        //TODO implement saving to local disk
 
         Signature signature = signService.addDigitalSignature(image,imageToSave);
 
